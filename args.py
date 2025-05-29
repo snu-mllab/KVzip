@@ -1,0 +1,29 @@
+import argparse
+
+parser = argparse.ArgumentParser(description='')
+parser.add_argument(
+    '--kv_type',
+    type=str,
+    default='evict',
+    choices=['evict', 'retain'],
+    help="retain: full cache in storage for effcient evaluation over multiple compression ratios")
+parser.add_argument(
+    '--level',
+    type=str,
+    default='pair',
+    choices=['pair', 'head', 'pair-uniform'],
+    help="head: context-independent head-level eviction. pair-uniform: uniform head-budget ratios")
+parser.add_argument('-r', '--ratio', type=float, default=0.3, help="compression ratio")
+
+parser.add_argument('-m', '--model', type=str, help="check the model list in model/load.py")
+parser.add_argument('--dtype', type=str, default=None, choices=['fp32', 'fp16', 'bf16'])
+
+parser.add_argument('-d',
+                    '--data',
+                    type=str,
+                    help="check the list of available datasets in data/load.py")
+parser.add_argument('--idx', type=int, default=0, help="the index of a data example")
+parser.add_argument('--num', type=int, default=1, help="the total number of eval data")
+
+parser.add_argument('--save_head_score', action="store_true")
+args = parser.parse_args()

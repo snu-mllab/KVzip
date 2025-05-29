@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools", "wheel", "packaging"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kvzip"
+version = "0.0.1"
+
+dependencies = [
+    "torch==2.3.0",
+    "transformers==4.51.3",
+    "datasets==3.6.0",
+    "accelerate==1.7.0",
+    "packaging==24.2",
+    "ninja==1.11.1.4",
+    "matplotlib",
+    "rouge-score",
+    "fuzzywuzzy",
+    "rich",
+    "tree-sitter-languages==1.10.2",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]

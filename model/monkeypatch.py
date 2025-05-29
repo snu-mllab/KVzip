@@ -1,0 +1,19 @@
+import transformers
+from attention.attn import llama_flash_attn2_forward, qwen3_flash_attn2_forward
+
+import transformers.models.gemma3.modeling_gemma3
+
+
+def replace_attn(model_name):
+    model_name = model_name.lower()
+    if "llama" in model_name:
+        transformers.models.llama.modeling_llama.LlamaAttention.forward = llama_flash_attn2_forward
+        print("Replace llama attention with KVzip")
+
+    elif "qwen2.5" in model_name:
+        transformers.models.qwen2.modeling_qwen2.Qwen2Attention.forward = llama_flash_attn2_forward
+        print("Replace qwen2.5 attention with KVzip")
+
+    elif "qwen3" in model_name:
+        transformers.models.qwen3.modeling_qwen3.Qwen3Attention.forward = qwen3_flash_attn2_forward
+        print("Replace qwen3 attention with KVzip")
