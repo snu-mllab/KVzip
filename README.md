@@ -77,7 +77,7 @@ for q in queries:
   ```
 
 ## Applying to New Models
-To integrate support for a new model, you will need to update the following files:
+To integrate KVzip for a new model, you will need to update the following files:
 - `attention/attn.py`  
   Modify the attention forward pass logic as needed. In certain cases, updates to kvcache.py and score.py may also be required.
 - `model/monkeypatch.py`  
