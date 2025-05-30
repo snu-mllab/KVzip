@@ -18,17 +18,23 @@
 
 
 ## Installation
-```
+```bash
 cd kvzip
 pip install -r requirements.txt
 pip install flash-attn==2.7.4.post1 --no-build-isolation
 make i
 ```
-
+### Dataset
+- Please download the preprocessed SCBench dataset from [Google Drive](https://drive.google.com/file/d/1cqoR6pxxFcjFqvPZkuAmF-fBSAlAbjbN/view?usp=share_link).
+- If you download the unzipped the files, simply move the scbench folder.
+```bash
+mv scbench.zip kvzip/data/
+cd kvzip/data
+unzip scbench.zip  
+```
 
 ## Quick Start
-### Context-dependent eviction
-```
+```python
 from model import ModelKVzip
 
 model = ModelKVzip("Qwen/Qwen2.5-7B-Instruct-1M")
@@ -45,19 +51,22 @@ for q in queries:
 ```
 - Supported models are listed in `model/load.py`, including **LLaMA3, Qwen2.5/3, Gemma3**.
 - After generation, KV pairs corresponding to the queries and generated tokens are selectively evicted from the cache for further processing. Set `update_cache=True` to enable multi-turn inference, retaining full interaction histories throughout the inference. 
-- We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
 
-- You can run the following command to compare outputs between full and pruned KV caches.
-  ```
-  python -B test.py -m llama3-8b -d squad --kv_type evict
-  ```
+## Profiling Memory and Computation Time
+### Context-dependent eviction
+```bash
+python -B test.py -m [model_name] -d [data_name] --kv_type evict
+```
+- The code above also compares outputs using full and pruned KV caches.
+- To quick test, use `-d squad` and for long-context testing, use `-d scbench_kv` (the full list of datasets is in `data/load.py`).
+- We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
 
 ### Context-independent eviction (no runtime compression overhead)
 - Use the `--level head` flag to perform head-level KV eviction (or set load_score=True in model.prefill).
   - We remove all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
   - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score`.
 - To compute head scores for other models:
-  ```
+  ```bash
   python -B test.py -m [model_name] -d scbench_qa_eng --save_head_score
   ```
   - Results will be saved in `./utils/head_score`.
@@ -66,13 +75,13 @@ for q in queries:
 
 ## Evaluation
 - To generate outputs across different compression ratios (from 0.1 to 1.0):
-    ```
+    ```bash
     python -B eval.py -m [model_name] -d [data_name] --kv_type retain --num 100
     ``` 
   - Results are saved in `./results/[data_name]`.
   - Supported datasets are listed in `data/load.py`.
 - To compute evaluation metrics from generated results:
-  ```
+  ```bash
   python -B -m results.parse -m [model_name] -d [data_name]
   ```
 
