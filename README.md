@@ -1,13 +1,13 @@
 # KVzip: Query-Agnostic KV Cache Compression with Context Reconstruction
 
-paper link
+[[Paper](https://arxiv.org/abs/2505.23416)]
 
 <img src="./images/method.png" width="800">
 
 ## What's New?
 - Efficiently compress reusable KV caches across diverse future queries.
 - Achieve a **3–4× reduction in KV cache size and a 2× decrease in decoding attention latency**, with minimal performance degradation.
-- Support [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style KV compression, with only a few forward passes and under one minute for optimization.
+- Support [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style KV compression, with only a few forward passes and under one minute for importance score optimization.
 
 
 ### Benchmarking on query-agnostic setting
@@ -23,7 +23,7 @@ cd kvzip
 make i
 pip install flash-attn==2.7.4 --no-build-isolation
 ```
-- Check pyproject.toml for dependencies (torch==2.3.0, transformers==4.51.3).
+- Check `pyproject.toml` for dependencies (torch==2.3.0, transformers==4.51.3).
 
 
 ## Quick Start
@@ -35,8 +35,8 @@ model = ModelKVzip("Qwen/Qwen2.5-7B-Instruct-1M")
 context = "This is my basic profile. My name is Kim living in Seoul. My major is computer science."
 queries = ["What is my name?", "Do I live in Seoul?"]
 
-kv = model.prefill(context)
-kv.prune(ratio=0.3)  # compression ratio, 30% KV size
+kv = model.prefill(context)  # prefill KV cache + importance scoring
+kv.prune(ratio=0.3)  # compression ratio, evict 70% KV
 
 for q in queries:
     query_ids = model.apply_template(q)
@@ -52,9 +52,10 @@ for q in queries:
   python -B test.py -m llama3-8b -d squad --kv_type evict
   ```
 
-### Context-independent eviction
-- Use the --level head flag to perform head-level KV eviction. This removes all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
-- Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score`.
+### Context-independent eviction (no runtime compression overhead)
+- Use the `--level head` flag to perform head-level KV eviction (or set load_score=True in model.prefill).
+  - We remove all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
+  - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score`.
 - To compute head scores for other models:
   ```
   python -B test.py -m [model_name] -d scbench_qa_eng --save_head_score
@@ -93,7 +94,7 @@ To integrate support for a new model, you will need to update the following file
 @article{kim2025kvzip,
         title={KVzip: Query-Agnostic KV Cache Compression with Context Reconstruction},
         author={Kim, Jang-Hyun and Kim, Jinuk and Kwon, Sangwoo and Lee, Jae W and Yun, Sangdoo and Song, Hyun Oh},
-        journal={arXiv},
+        journal={arXiv preprint arXiv:2505.23416},
         year={2024}
 }
 ```
