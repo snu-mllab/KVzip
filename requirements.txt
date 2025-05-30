@@ -1,0 +1,12 @@
+torch==2.3.0
+transformers==4.51.3
+datasets==3.6.0
+accelerate==1.7.0
+packaging==24.2
+ninja==1.11.1.4
+pandas==2.0.3
+numpy==1.26.4
+scipy==1.14.1
+scikit-learn==1.5.2
+future==1.0.0
+deco

@@ -18,6 +18,12 @@ dependencies = [
     "fuzzywuzzy",
     "rich",
     "tree-sitter-languages==1.10.2",
+    "pandas==2.0.3",
+    "numpy==1.26.4",
+    "scipy==1.14.1",
+    "scikit-learn==1.5.2",
+    "future==1.0.0",
+    "decorator==5.1.1",
 ]
 
 [tool.setuptools.packages.find]
