@@ -62,7 +62,7 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict
 - We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
 
 ### Context-independent eviction (no runtime compression overhead)
-- Use the `--level head` flag to perform head-level KV eviction (or set load_score=True in model.prefill).
+- Use the `--level head` flag, or set `model.prefill(context, load_score=True)`.
   - We remove all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
   - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score`.
 - To compute head scores for other models:
