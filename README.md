@@ -20,10 +20,10 @@
 ## Installation
 ```
 cd kvzip
+pip install -r requirements.txt
+pip install flash-attn==2.7.4.post1 --no-build-isolation
 make i
-pip install flash-attn==2.7.4 --no-build-isolation
 ```
-- Check `pyproject.toml` for dependencies (torch==2.3.0, transformers==4.51.3).
 
 
 ## Quick Start
@@ -40,7 +40,7 @@ kv.prune(ratio=0.3)  # compression ratio, evict 70% KV
 
 for q in queries:
     query_ids = model.apply_template(q)
-    output = model.generate(query_ids, kv=kv, update_cache=False)
+    output = model.generate(query_ids, kv=kv, update_cache=False)  # efficient inference
     print(q, output)
 ```
 - Supported models are listed in `model/load.py`, including **LLaMA3, Qwen2.5/3, Gemma3**.
@@ -70,6 +70,7 @@ for q in queries:
     python -B eval.py -m [model_name] -d [data_name] --kv_type retain --num 100
     ``` 
   - Results are saved in `./results/[data_name]`.
+  - Supported datasets are listed in `data/load.py`.
 - To compute evaluation metrics from generated results:
   ```
   python -B -m results.parse -m [model_name] -d [data_name]

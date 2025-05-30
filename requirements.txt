@@ -9,4 +9,9 @@ numpy==1.26.4
 scipy==1.14.1
 scikit-learn==1.5.2
 future==1.0.0
-deco
+decorator==5.1.1
+matplotlib
+rouge-score
+fuzzywuzzy
+rich
+tree-sitter-languages==1.10.2
