@@ -57,6 +57,7 @@ def load_model(model_name: str, dtype=None, **kwargs):
             torch_dtype=config.torch_dtype if dtype is None else get_dtype(dtype),
             device_map="auto",
             attn_implementation='flash_attention_2',
+            config=config,
         )
         tokenizer = AutoTokenizer.from_pretrained(model_id)
 
