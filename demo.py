@@ -40,5 +40,6 @@ for q in queries:
     query_ids = model.apply_template(q)
     output = model.generate(query_ids, kv=kv, update_cache=False)  # efficient inference
     print(model.decode(query_ids), output)
-    stamp(f"[After Generation]")
+    num_tokens = query_ids.shape[1] + model.encode(output).shape[1] + 1  # eos token
+    stamp(f"[After Generation]", denominator=num_tokens)
     print("-" * 100)

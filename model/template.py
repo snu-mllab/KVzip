@@ -22,6 +22,12 @@ def template(model_name, task):
 
         postfix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
 
+    elif "gemma3" in model_name:
+        prefix = "<bos><start_of_turn>user\n"
+        prefix += "You are a helpful assistant.\n\n"
+
+        postfix = "<end_of_turn>\n<start_of_turn>model\n"
+
     else:
         print("**Warning** The model template does not exist! Check data/template.py")
         prefix = "<|begin_of_text|>"
