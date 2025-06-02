@@ -64,7 +64,7 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict
 ### Context-independent eviction (no runtime compression overhead)
 - Use the `--level head` flag, or set `model.prefill(context, load_score=True)`.
   - We remove all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
-  - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score` (use abbreviated model flags like `-m qwen2.5-7b`).
+  - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score` (use abbreviated model names like `-m qwen2.5-7b`).
 - To compute head scores for other models:
   ```bash
   python -B test.py -m [model_name] -d scbench_qa_eng --save_head_score
