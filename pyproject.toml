@@ -11,7 +11,7 @@ dependencies = [
     "transformers==4.51.3",
     "datasets==3.6.0",
     "accelerate==1.7.0",
-    "packaging==24.2",
+    "packaging==25.0",
     "ninja==1.11.1.4",
     "matplotlib",
     "rouge-score",

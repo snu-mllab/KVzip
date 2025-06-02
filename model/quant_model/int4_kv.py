@@ -1,5 +1,6 @@
 import torch
 from attention.kvcache import RetainCache
+from attention.score import KVScore
 from typing import List, Tuple, Union, Optional
 
 import quantize_int4 as module
@@ -280,8 +281,27 @@ class OptimINT4KVCache(StaticINT4KVCache, RetainCache):
         max_size=140000,
         prefilling_chunk_size=140000,
     ):
-        RetainCache.__init__(self, model, evict_range)
-        StaticINT4KVCache.__init__(model, batch_size, max_size, prefilling_chunk_size)
+        StaticINT4KVCache.__init__(self, model, batch_size, max_size, prefilling_chunk_size)
+        self.device = next(model.parameters()).device
+        self.dtype = next(model.parameters()).dtype
+        self.n_layers = model.config.num_hidden_layers
+        self.n_heads = model.config.num_attention_heads
+        self.n_heads_kv = model.config.num_key_value_heads
+        self.n_group_kv = self.n_heads // self.n_heads_kv
+
+        self.start_idx, self.end_idx = evict_range
+        self.ctx_len = self.end_idx - self.start_idx
+        self.sink = self.start_idx
+        self.prefill_ids = None
+        self.ctx_ids = None
+
+        self.get_score = False  # indicator for KV scoring
+        self.pruned = False
+
+        self.valid_pad = torch.ones((1, self.n_heads_kv, self.start_idx),
+                                    dtype=bool,
+                                    device=self.device)
+
 
     def slice(self, seen_token_prev):
         bf_kv_seq_len = self.kv_seq_len

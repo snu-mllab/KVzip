@@ -286,7 +286,12 @@ class ModelKVzip():
         """
         kv = self._init_kv(kv=kv)
 
-        output = self.__call__(input_ids, kv, update_cache=False, return_logits=True).logits[0]
+        if isinstance(self.model, LlamaForCausalLMW8A8):
+            output = self.__call__(input_ids, kv, update_cache=False, return_logits=True, is_prompt=False)
+            output = output[0]
+        else:
+            output = self.__call__(input_ids, kv, update_cache=False, return_logits=True)
+            output = output.logits[0]
         output = inplace_softmax(output).squeeze()
 
         if device == "cpu":

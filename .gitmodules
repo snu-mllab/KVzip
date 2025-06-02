@@ -1,0 +1,4 @@
+[submodule "model/quant_model/omniserve"]
+	path = model/quant_model/omniserve
+	url = https://github.com/jusjinuk/omniserve
+	branch = kvcache

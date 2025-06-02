@@ -1,7 +1,7 @@
 from model.quant_model.w8a8kv4_llama import LlamaAttention, LlamaForCausalLM as LlamaForCausalLMW8A8
 from model.quant_model.int4_kv import OptimINT4KVCache
 from model.quant_model.attn import quant_llama_flash_attn2_forward
-from wrapper import ModelWrapper
+from model.wrapper import ModelKVzip
 import torch
 from tqdm import tqdm
 from typing import List, Tuple, Union, Optional
@@ -13,8 +13,8 @@ def replace_attn():
 
 
 def replace_quantized_wrapper():
-    ModelWrapper.__call__ = quantized_model__call__
-    ModelWrapper.generate = quantized_model_generate
+    ModelKVzip.__call__ = quantized_model__call__
+    ModelKVzip.generate = quantized_model_generate
 
 
 ### Functions to dispatch
@@ -29,7 +29,7 @@ def quantized_model__call__(
     *args,
     **kwargs,
 ):
-    assert isinstance(self.kv, OptimINT4KVCache)
+    assert isinstance(kv, OptimINT4KVCache)
     """ Compute Transformer forward pass
             In default, we do not update the KV cache with the newly given inputs.
             Set update_cache = True to enable the update.
@@ -45,6 +45,7 @@ def quantized_model__call__(
 
     if not update_cache:
         kv.slice(seen_token_prev)
+    
     return outputs
 
 
@@ -53,7 +54,6 @@ def quantized_model_generate(
     self,
     query: Union[str, torch.Tensor],
     kv: Optional[OptimINT4KVCache] = None,
-    prefill_ids: Optional[torch.tensor] = None,
     update_cache: bool = False,
 ) -> str:
     """ Obtain a model response to the query
@@ -63,8 +63,8 @@ def quantized_model_generate(
     input_ids = query
     if type(query) == str:
         input_ids = self.encode(query)
-    if prefill_ids is not None:
-        input_ids = torch.cat([prefill_ids, input_ids], dim=1)
+    if kv.prefill_ids is not None:
+        input_ids = torch.cat([kv.prefill_ids, input_ids], dim=1)
 
     kv = self._init_kv(kv=kv)
     seen_token_prev = kv.kv_seq_len
