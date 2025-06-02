@@ -59,11 +59,13 @@ def load_model(model_name: str, dtype=None, **kwargs):
                 "original_max_position_embeddings": 32768
             }
             config.max_position_embeddings = 131072
+
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
             torch_dtype=config.torch_dtype if dtype is None else get_dtype(dtype),
             device_map="auto",
             attn_implementation='flash_attention_2',
+            config=config,
         )
         tokenizer = AutoTokenizer.from_pretrained(model_id)
 
