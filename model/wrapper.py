@@ -37,6 +37,13 @@ def chunk_fn(ctx_ids: torch.Tensor, chunk_size: int) -> List[torch.Tensor]:
 
 
 def load_head_score(model_name, ctx_len, source="scbench_qa_eng"):
+    if model_name.startswith("Qwen/Qwen2.5-7B"):
+        model_name = "qwen2.5-7b"
+    elif model_name.startswith("Qwen/Qwen2.5-14B"):
+        model_name = "qwen2.5-14b"
+    elif model_name.startswith("meta-llama/Llama-3.1-8B-Instruct"):
+        model_name = "llama3-8b"
+
     path = f"./utils/head_score/{model_name}-{source}-0.pt"
     attn = torch.load(path).squeeze().cuda()  # layer x head
     score = attn.unsqueeze(-1).expand(-1, -1, ctx_len)  # layer x head x seq
@@ -138,6 +145,7 @@ class ModelKVzip():
         ctx_ids: Union[str, torch.Tensor],
         prefill_chunk_size: int = 16000,
         load_score=False,
+        do_score=True,
     ) -> Union[RetainCache, EvictCache]:
         """ Chunked prefill KV cache
         """
@@ -151,11 +159,12 @@ class ModelKVzip():
         kv.prefill_ids = prefill_ids
 
         # prefill
-        for input_ids in chunk_fn(prefill_ids, prefill_chunk_size):
+        for input_ids in tqdm(chunk_fn(prefill_ids, prefill_chunk_size), desc="Prefill"):
             self.__call__(input_ids, kv, update_cache=True)
 
-        # KV importance scoring
-        self.scoring(kv, ctx_ids, load_score=load_score)
+        if do_score:
+            # KV importance scoring
+            self.scoring(kv, ctx_ids, load_score=load_score)
         return kv
 
     def self_task(
