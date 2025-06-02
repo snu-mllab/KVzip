@@ -18,8 +18,9 @@
 
 
 ## Installation
+We used CUDA 12.1 and Python 3.10
 ```bash
-cd kvzip
+cd KVzip
 pip install -r requirements.txt
 pip install flash-attn==2.7.4.post1 --no-build-isolation
 make i
@@ -34,6 +35,7 @@ unzip scbench.zip
 ```
 
 ## Quick Start
+### Context-dependent eviction
 ```python
 from model import ModelKVzip
 
@@ -60,6 +62,11 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict
 - The code above also compares outputs using full and pruned KV caches.
 - To quick test, use `-d squad` and for long-context testing, use `-d scbench_kv` (the full list of datasets is in `data/load.py`).
 - We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
+
+- You can run the following command to compare outputs between full and pruned KV caches.
+  ```bash
+  python -B test.py -m llama3-8b -d squad --kv_type evict
+  ```
 
 ### Context-independent eviction (no runtime compression overhead)
 - Use the `--level head` flag, or set `model.prefill(context, load_score=True)`.
@@ -100,7 +107,7 @@ To integrate KVzip for a new model, you will need to update the following files:
 - QServe quantized model
 
 ## Citation
-```
+```bibtex
 @article{kim2025kvzip,
         title={KVzip: Query-Agnostic KV Cache Compression with Context Reconstruction},
         author={Kim, Jang-Hyun and Kim, Jinuk and Kwon, Sangwoo and Lee, Jae W and Yun, Sangdoo and Song, Hyun Oh},
