@@ -61,18 +61,18 @@ class TimeStamp():
             torch.cuda.synchronize()
             self.start = time()
 
-    def elapsed(self):
+    def elapsed(self, denominator=1.0):
         # example implementation
         val = time() - self.start
         if self.unit == "ms":
             val *= 1000
-        return round(val, self.precision)
+        return round(val/denominator, self.precision)
 
     def __call__(self, msg="", denominator=1.0):
         if self.verbose:
             torch.cuda.synchronize()
             allc_mem, total_mem = gmem(print=False)
-            tt = self.elapsed() / denominator
+            tt = self.elapsed(denominator)
             print(f"## Time: {tt}{self.unit}. Mem: {allc_mem:.2f}/{total_mem:.2f} GB. [{msg}]")
             print(flush=True)
             self.set()
