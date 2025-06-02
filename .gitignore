@@ -8,6 +8,7 @@ kvzip.egg-info
 *$py.class
 *.pt
 *.npy
+*.zip
 quick.py
 results/*
 
