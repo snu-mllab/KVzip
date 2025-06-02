@@ -38,11 +38,14 @@ def inplace_softmax(x, dim=-1):
     return x
 
 
-def gmem(text=""):
+def gmem(text="", print=True):
     _, total_mem = torch.cuda.mem_get_info(0)
     total_mem = total_mem / 1024**3
     allc_mem = torch.cuda.memory_allocated(0) / 1024**3
-    print(f"## {allc_mem:.2f}/{total_mem:.2f} GB, {text}")
+    msg = f"## {allc_mem:.2f}/{total_mem:.2f} GB, {text}"
+    if print:
+        print(msg)
+    return allc_mem, total_mem
 
 
 class TimeStamp():
@@ -65,10 +68,11 @@ class TimeStamp():
             val *= 1000
         return round(val, self.precision)
 
-    def __call__(self, msg=""):
+    def __call__(self, msg="", denominator=1.0):
         if self.verbose:
             torch.cuda.synchronize()
-            print(f"## Time: {self.elapsed()}{self.unit}, {msg}")
-            # gmem()
+            allc_mem, total_mem = gmem(print=False)
+            tt = self.elapsed() / denominator
+            print(f"## Time: {tt}{self.unit}. Mem: {allc_mem:.2f}/{total_mem:.2f} GB. [{msg}]")
             print(flush=True)
             self.set()

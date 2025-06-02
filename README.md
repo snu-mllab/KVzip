@@ -7,7 +7,7 @@
 ## What's New?
 - Efficiently compress reusable KV caches across diverse future queries.
 - Achieve a **3–4× reduction in KV cache size and a 2× decrease in decoding attention latency**, with minimal performance degradation.
-- Support [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style KV compression, with only a few forward passes and under one minute for importance score optimization.
+- Support [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style KV compression, with only a few forward passes and under one minute for importance score optimization (100x faster).
 
 
 ### Benchmarking on query-agnostic setting
