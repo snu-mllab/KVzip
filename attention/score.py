@@ -118,3 +118,22 @@ class KVScore():
 
         valids = torch.stack(valids)
         return valids, 0
+
+
+class HybridKVScore(KVScore):
+
+    def init_score(self):
+        self.get_score = True
+        self.causal_mask_score = None
+
+        self.score = [
+            torch.zeros((1, self.n_heads_kv, 0), dtype=self.dtype, device=self.device)
+            for _ in range(self.num_static_layers)
+        ]
+
+    
+    def _get_score(self, query_states, key_states, layer_idx):
+        if layer_idx in self.layer_id_to_static_id:
+            static_layer_idx = self.layer_id_to_static_id[layer_idx]
+            super()._get_score(query_states, key_states, static_layer_idx)
+

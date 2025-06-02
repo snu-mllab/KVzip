@@ -5,9 +5,9 @@
 import torch
 from typing import List, Tuple, Union, Optional
 from tqdm import tqdm
-from transformers import DynamicCache
+from transformers import DynamicCache, Gemma3ForCausalLM, Qwen3ForCausalLM
 
-from attention.kvcache import RetainCache, EvictCache
+from attention.kvcache import RetainCache, EvictCache, RetainHybridCache
 from utils.func import inplace_softmax
 from model.load import load_model
 from model.quant_model import OptimINT4KVCache, LlamaForCausalLMW8A8
@@ -62,8 +62,15 @@ class ModelKVzip():
         self.dtype = self.model.dtype
         self.device = self.model.device
         self.config = self.model.config
-        self.kv_type = kv_type
-        print(f"KV type: {kv_type}")
+
+        if isinstance(self.model, LlamaForCausalLMW8A8):
+            self.kv_type = "int4static"
+        elif isinstance(self.model, Gemma3ForCausalLM):
+            self.kv_type = "hybrid_static"
+        else:
+            self.kv_type = kv_type
+        print(f"KV type: {self.kv_type}")
+
 
         self.gen_kwargs = {
             "do_sample": False,
@@ -72,6 +79,15 @@ class ModelKVzip():
             "top_k": None,
             "max_new_tokens": 512,
         }
+        if isinstance(self.model, Gemma3ForCausalLM):
+            self.gen_kwargs["cache_implementation"] = None
+            self.gen_kwargs["use_model_defaults"] = False
+            self.gen_kwargs["eos_token_id"] = [1, 106]
+        elif isinstance(self.model, Qwen3ForCausalLM):
+            self.gen_kwargs["cache_implementation"] = None
+            self.gen_kwargs["use_model_defaults"] = False
+            self.gen_kwargs["eos_token_id"] = 151645
+
         self.set_chat_template()
 
     def encode(self, text: str) -> torch.Tensor:
@@ -110,6 +126,9 @@ class ModelKVzip():
         """
         seen_token_prev = kv._seen_tokens
 
+        if isinstance(kv, RetainHybridCache) and not update_cache:
+            kv.backup_sliding_cache()
+
         if return_logits:
             outputs = self.model(input_ids, past_key_values=kv, *args, **kwargs)
         else:
@@ -123,15 +142,17 @@ class ModelKVzip():
     def _init_kv(self, kv=None, evict_range=(0, 0)):
         """ Initialize KV cache
         """
-        if isinstance(self.model, LlamaForCausalLMW8A8):
-            self.kv_type = "int4static"
+        
         if kv is None:
             if self.kv_type == "retain":
                 kv = RetainCache(self.model, evict_range)
             elif self.kv_type == "evict":
                 kv = EvictCache(self.model, evict_range)
             elif self.kv_type == "int4static":
-                kv = OptimINT4KVCache(self.model, evict_range)
+                kv = OptimINT4KVCache(self.model.model, evict_range)
+            elif self.kv_type == "hybrid_static":
+                max_size = 190000
+                kv = RetainHybridCache(self.model.model, evict_range, max_size)
             elif self.kv_type == "original":
                 kv = DynamicCache()
                 kv.pruned, kv.get_score = False, False
@@ -237,6 +258,9 @@ class ModelKVzip():
         """
         kv = self._init_kv(kv=kv)
         seen_token_prev = kv._seen_tokens
+
+        if isinstance(kv, RetainHybridCache) and not update_cache:
+            kv.backup_sliding_cache()
 
         input_ids = query
         if type(query) == str:

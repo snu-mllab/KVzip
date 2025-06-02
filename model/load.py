@@ -52,6 +52,13 @@ def load_model(model_name: str, dtype=None, **kwargs):
         replace_attn(model_id)
 
         config = AutoConfig.from_pretrained(model_id)
+        if "qwen3-" in model_name:
+            config.rope_scaling = {
+                "rope_type": "yarn",
+                "factor": 4.0,
+                "original_max_position_embeddings": 32768
+            }
+            config.max_position_embeddings = 131072
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
             torch_dtype=config.torch_dtype if dtype is None else get_dtype(dtype),
@@ -62,6 +69,9 @@ def load_model(model_name: str, dtype=None, **kwargs):
 
         if "llama" in model_id.lower():
             model.generation_config.pad_token_id = tokenizer.pad_token_id = 128004
+        
+        if "gemma-3" in model_id.lower():
+            model = model.language_model
     else:
         model, tokenizer = load_quant_model(quant_model_id=model_id)
 
