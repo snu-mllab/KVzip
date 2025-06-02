@@ -18,8 +18,9 @@
 
 
 ## Installation
-```
-cd kvzip
+We used CUDA 12.1 and Python 3.10
+```bash
+cd KVzip
 pip install -r requirements.txt
 pip install flash-attn==2.7.4.post1 --no-build-isolation
 make i
@@ -28,7 +29,7 @@ make i
 
 ## Quick Start
 ### Context-dependent eviction
-```
+```python
 from model import ModelKVzip
 
 model = ModelKVzip("Qwen/Qwen2.5-7B-Instruct-1M")
@@ -48,7 +49,7 @@ for q in queries:
 - We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
 
 - You can run the following command to compare outputs between full and pruned KV caches.
-  ```
+  ```bash
   python -B test.py -m llama3-8b -d squad --kv_type evict
   ```
 
@@ -57,7 +58,7 @@ for q in queries:
   - We remove all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
   - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score`.
 - To compute head scores for other models:
-  ```
+  ```bash
   python -B test.py -m [model_name] -d scbench_qa_eng --save_head_score
   ```
   - Results will be saved in `./utils/head_score`.
@@ -66,13 +67,13 @@ for q in queries:
 
 ## Evaluation
 - To generate outputs across different compression ratios (from 0.1 to 1.0):
-    ```
+    ```bash
     python -B eval.py -m [model_name] -d [data_name] --kv_type retain --num 100
     ``` 
   - Results are saved in `./results/[data_name]`.
   - Supported datasets are listed in `data/load.py`.
 - To compute evaluation metrics from generated results:
-  ```
+  ```bash
   python -B -m results.parse -m [model_name] -d [data_name]
   ```
 
@@ -91,12 +92,12 @@ To integrate support for a new model, you will need to update the following file
 - QServe quantized model
 
 ## Citation
-```
+```bibtex
 @article{kim2025kvzip,
-        title={KVzip: Query-Agnostic KV Cache Compression with Context Reconstruction},
-        author={Kim, Jang-Hyun and Kim, Jinuk and Kwon, Sangwoo and Lee, Jae W and Yun, Sangdoo and Song, Hyun Oh},
-        journal={arXiv preprint arXiv:2505.23416},
-        year={2024}
+  title={KVzip: Query-Agnostic KV Cache Compression with Context Reconstruction},
+  author={Kim, Jang-Hyun and Kim, Jinuk and Kwon, Sangwoo and Lee, Jae W and Yun, Sangdoo and Song, Hyun Oh},
+  journal={arXiv preprint arXiv:2505.23416},
+  year={2024}
 }
 ```
 
