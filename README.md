@@ -8,12 +8,13 @@
 - KVzip compresses the KV cache to support **diverse future queries**.
 - [Context-dependent] Achieve a **3–4× reduction in KV cache size** and a **2× decrease in decoding latency**, with minimal performance degradation.
 - [Context-independent] Enhance [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style head-level KV compression, using only **a few forward passes within one minute** for head-level importance-score optimization (100x faster).
-
+- Run demo.py:
 <img src="./images/demo.png" width="800">
+
 
 ### Benchmarking on query-agnostic setting
 - Tasks: [SQuAD](https://huggingface.co/datasets/rajpurkar/squad), [NIAH](https://github.com/gkamradt/LLMTest_NeedleInAHaystack), [SCBench](https://github.com/microsoft/MInference/tree/main/scbench), [GSM8K](https://huggingface.co/datasets/openai/gsm8k/viewer/main/train?row=7294). 
-- Model: [Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
+- Model: [Qwen2.5-7B-Instruct-1M](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
 
 <img src="./images/benchmark.png" width="800">
 
