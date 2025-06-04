@@ -5,9 +5,9 @@
 <img src="./images/method.png" width="800">
 
 ## What's New?
-- Efficiently compress **reusable** KV caches across diverse future queries.
+- KVzip compresses the KV cache to support **diverse future queries**.
 - [Context-dependent] Achieve a **3–4× reduction in KV cache size** and a **2× decrease in decoding latency**, with minimal performance degradation.
-- [Context-independent] Enhance [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style head-level KV compression, with only a few forward passes and under one minute for importance score optimization (100x faster).
+- [Context-independent] Enhance [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style head-level KV compression, using only **a few forward passes within one minute** for head-level importance-score optimization (100x faster).
 
 <img src="./images/demo.png" width="800">
 
