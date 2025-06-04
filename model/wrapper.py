@@ -42,7 +42,7 @@ def load_head_score(model_name, ctx_len, source="scbench_qa_eng"):
     elif model_name.startswith("Qwen/Qwen2.5-14B"):
         model_name = "qwen2.5-14b"
     elif model_name.startswith("meta-llama/Llama-3.1-8B-Instruct"):
-        model_name = "llama3-8b"
+        model_name = "llama3.1-8b"
 
     path = f"./utils/head_score/{model_name}-{source}-0.pt"
     attn = torch.load(path).squeeze().cuda()  # layer x head
