@@ -5,18 +5,18 @@ from transformers import AutoConfig, AutoTokenizer, AutoModelForCausalLM
 def get_model_id(name: str):
     size = name.split("-")[-1].split("b")[0]  # xx-14b
 
-    if name == "llama3-1b":
+    if name == "llama3.2-1b":
         return "meta-llama/Llama-3.2-1B-Instruct"
-    elif name == "llama3-3b":
+    elif name == "llama3.2-3b":
         return "meta-llama/Llama-3.2-3B-Instruct"
-    elif name == "llama3-8b":
+    elif name == "llama3.1-8b":
         return "meta-llama/Llama-3.1-8B-Instruct"
+    elif name == "llama3.0-8b":
+        return "meta-llama/Meta-Llama-3-8B-Instruct"
     elif name == "duo":
         return "gradientai/Llama-3-8B-Instruct-Gradient-1048k"
     elif name == "llama3-8b-4m-w8a8kv4":
         return "mit-han-lab/Llama-3-8B-Instruct-Gradient-4194k-w8a8kv4-per-channel"
-    elif name == "llama30-8b":
-        return "meta-llama/Meta-Llama-3-8B-Instruct"
 
     elif name.startswith("qwen2.5-"):
         assert size in ["7", "14"], "Model is not supported!"
@@ -71,7 +71,7 @@ def load_model(model_name: str, dtype=None, **kwargs):
 
         if "llama" in model_id.lower():
             model.generation_config.pad_token_id = tokenizer.pad_token_id = 128004
-        
+
         if "gemma-3" in model_id.lower():
             model = model.language_model
     else:

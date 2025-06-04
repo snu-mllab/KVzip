@@ -15,13 +15,19 @@ parser.add_argument(
     help="head: context-independent head-level eviction. pair-uniform: uniform head-budget ratios")
 parser.add_argument('-r', '--ratio', type=float, default=0.3, help="compression ratio")
 
-parser.add_argument('-m', '--model', type=str, help="check the model list in model/load.py")
-parser.add_argument('--dtype', type=str, default=None, choices=['fp32', 'fp16', 'bf16'])
+parser.add_argument(
+    '-m',
+    '--model',
+    type=str,
+    help=
+    "check the model list in model/load.py. recommended to use abbreviated model names, e.g., llama3-8b, qwen2.5-7b"
+)
+parser.add_argument('--dtype', type=str, default=None, help="model dtype (automatically loaded)")
 
 parser.add_argument('-d',
                     '--data',
                     type=str,
-                    help="check the list of available datasets in data/load.py")
+                    help="check the dataset list in data/load.py (e.g., squad, needle, scbench_kv)")
 parser.add_argument('--idx', type=int, default=0, help="the index of a data example")
 parser.add_argument('--num', type=int, default=1, help="the total number of eval data")
 

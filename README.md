@@ -1,14 +1,15 @@
 # KVzip: Query-Agnostic KV Cache Compression with Context Reconstruction
 
-[[Paper](https://arxiv.org/abs/2505.23416)]
+[[Paper](https://arxiv.org/abs/2505.23416)] [[Blog](https://janghyun1230.github.io/kvzip/)] 
 
 <img src="./images/method.png" width="800">
 
 ## What's New?
-- Efficiently compress reusable KV caches across diverse future queries.
-- Achieve a **3–4× reduction in KV cache size and a 2× decrease in decoding attention latency**, with minimal performance degradation.
-- Support [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style KV compression, with only a few forward passes and under one minute for importance score optimization (100x faster).
+- Efficiently compress **reusable** KV caches across diverse future queries.
+- [Context-dependent] Achieve a **3–4× reduction in KV cache size** and a **2× decrease in decoding latency**, with minimal performance degradation.
+- [Context-independent] Enhance [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style head-level KV compression, with only a few forward passes and under one minute for importance score optimization (100x faster).
 
+<img src="./images/demo.png" width="800">
 
 ### Benchmarking on query-agnostic setting
 - Tasks: [SQuAD](https://huggingface.co/datasets/rajpurkar/squad), [NIAH](https://github.com/gkamradt/LLMTest_NeedleInAHaystack), [SCBench](https://github.com/microsoft/MInference/tree/main/scbench), [GSM8K](https://huggingface.co/datasets/openai/gsm8k/viewer/main/train?row=7294). 
@@ -25,6 +26,7 @@ pip install -r requirements.txt
 pip install flash-attn==2.7.4.post1 --no-build-isolation
 make i
 ```
+- To use [QServe](https://github.com/mit-han-lab/omniserve) quantization, please follow [`./model/quant_model`](https://github.com/snu-mllab/KVzip/tree/main/model/quant_model).
 ### Dataset
 - Please download the preprocessed SCBench dataset from [Google Drive](https://drive.google.com/file/d/1cqoR6pxxFcjFqvPZkuAmF-fBSAlAbjbN/view?usp=share_link).
 - If you download the unzipped the files, simply move the scbench folder.
@@ -35,7 +37,6 @@ unzip scbench.zip
 ```
 
 ## Quick Start
-### Context-dependent eviction
 ```python
 from model import ModelKVzip
 
@@ -43,7 +44,7 @@ model = ModelKVzip("Qwen/Qwen2.5-7B-Instruct-1M")
 context = "This is my basic profile. My name is Kim living in Seoul. My major is computer science."
 queries = ["What is my name?", "Do I live in Seoul?"]
 
-kv = model.prefill(context)  # prefill KV cache + importance scoring
+kv = model.prefill(context, load_score=False)  # prefill KV cache + importance scoring
 kv.prune(ratio=0.3)  # compression ratio, evict 70% KV
 
 for q in queries:
@@ -51,7 +52,8 @@ for q in queries:
     output = model.generate(query_ids, kv=kv, update_cache=False)  # efficient inference
     print(q, output)
 ```
-- Supported models are listed in `model/load.py`, including **LLaMA3, Qwen2.5/3, Gemma3**.
+- Supported models are listed in [`model/load.py`](https://github.com/snu-mllab/KVzip/blob/main/model/load.py), including **LLaMA3, Qwen2.5/3, Gemma3**.
+- Set `load_score=True` to eliminate compression overhead. This enables context-independent KV eviction, with a trade-off in compression ratio of `ratio=0.55`.
 - After generation, KV pairs corresponding to the queries and generated tokens are selectively evicted from the cache for further processing. Set `update_cache=True` to enable multi-turn inference, retaining full interaction histories throughout the inference. 
 
 ## Profiling Memory and Computation Time
@@ -59,17 +61,15 @@ for q in queries:
 ```bash
 python -B test.py -m [model_name] -d [data_name] --kv_type evict
 ```
-- The code above also compares outputs using full and pruned KV caches.
-- To quick test, use `-d squad` and for long-context testing, use `-d scbench_kv` (the full list of datasets is in `data/load.py`).
+- The code above also compares outputs generated with full versus pruned KV caches.
+- To quick test, use `-d squad`. For long-context testing, use `-d scbench_kv`
+  - Available data names: [`data/load.py`](https://github.com/snu-mllab/KVzip/blob/main/data/load.py).
+  - Available model names: [`model/load.py`](https://github.com/snu-mllab/KVzip/blob/main/model/load.py), e.g., llama3-8b, qwen2.5-7b (or Qwen/Qwen2.5-7B-Instruct-1M).
 - We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
 
-- You can run the following command to compare outputs between full and pruned KV caches.
-  ```bash
-  python -B test.py -m llama3-8b -d squad --kv_type evict
-  ```
 
 ### Context-independent eviction (no runtime compression overhead)
-- Use the `--level head` flag, or set `model.prefill(context, load_score=True)`.
+- Use the `--level head` flag.
   - We remove all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
   - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score` (use abbreviated model names like `-m qwen2.5-7b`).
 - To compute head scores for other models:
@@ -81,11 +81,11 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict
 
 
 ## Evaluation
-- To generate outputs across different compression ratios (from 0.1 to 1.0):
+- To generate responses across a range of compression ratios (from 0.1 to 1.0):
     ```bash
     python -B eval.py -m [model_name] -d [data_name] --kv_type retain --num 100
     ``` 
-  - Results are saved in `./results/[data_name]`.
+  - Results will be saved in `./results/[data_name]`.
   - Supported datasets are listed in `data/load.py`.
 - To compute evaluation metrics from generated results:
   ```bash
@@ -101,10 +101,6 @@ To integrate KVzip for a new model, you will need to update the following files:
 - `model/template.py`   
   Define the model's system prompt and chat formatting templates.
 
-
-## TODO
-- Gemma3
-- QServe quantized model
 
 ## Citation
 ```bibtex

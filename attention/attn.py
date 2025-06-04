@@ -124,7 +124,8 @@ def gemma3_attn_forward(
             "cache_position": cache_position,
             "sliding_window": self.sliding_window,
         }
-        key_states, value_states = past_key_value.update(key_states, value_states, self.layer_idx, cache_kwargs)
+        key_states, value_states = past_key_value.update(key_states, value_states, self.layer_idx,
+                                                         cache_kwargs)
 
         # # Here we need to slice as we use a static cache by default, but FA2 does not support it
         # if attention_mask is not None and self.config._attn_implementation == "flash_attention_2":
@@ -146,7 +147,8 @@ def gemma3_attn_forward(
     if getattr(past_key_value, "get_score", None):
         past_key_value._get_score(query_states, key_states, self.layer_idx)
 
-    if getattr(past_key_value, "pruned", None) and self.layer_idx in past_key_value.layer_id_to_static_id:
+    if getattr(past_key_value, "pruned",
+               None) and self.layer_idx in past_key_value.layer_id_to_static_id:
 
         key_states = key_states.contiguous()
         value_states = value_states.contiguous()
@@ -166,7 +168,6 @@ def gemma3_attn_forward(
             dropout_p=0.0,
             causal=True,
         )
-
 
         attn_output = attn_output.view(bsz, self.config.num_key_value_heads, q_len,
                                        self.num_key_value_groups, self.head_dim).transpose(1, 2)
@@ -207,7 +208,6 @@ def gemma3_attn_forward(
         attn_output = attn_output.reshape(*input_shape, -1).contiguous()
         attn_output = self.o_proj(attn_output)
     return attn_output, None
-
 
 
 def qwen3_flash_attn2_forward(

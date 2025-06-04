@@ -354,13 +354,20 @@ class RetainCache(DynamicCache, KVScore):
 
 
 class RetainHybridCache(HybridCache, HybridKVScore):
+    """ Retain KV cache for Gemma3 models (Hybrid,Static)
+    """
 
     def __init__(self, model, evict_range: Tuple[int, int], max_cache_len: int):
 
         self.device = next(model.parameters()).device
         self.dtype = next(model.parameters()).dtype
         config = model.config
-        HybridCache.__init__(self, config, max_batch_size=1, max_cache_len=max_cache_len, device=self.device, dtype=self.dtype)
+        HybridCache.__init__(self,
+                             config,
+                             max_batch_size=1,
+                             max_cache_len=max_cache_len,
+                             device=self.device,
+                             dtype=self.dtype)
         self.device = next(model.parameters()).device
         self.dtype = next(model.parameters()).dtype
         self.n_layers = config.num_hidden_layers
@@ -387,17 +394,19 @@ class RetainHybridCache(HybridCache, HybridKVScore):
         self._cur_tokens = 0
 
         static_freq = config.sliding_window_pattern
-        self.static_layer_ids = list(range(static_freq-1, self.n_layers, static_freq))
-        self.layer_id_to_static_id = {layer_id: static_id for static_id, layer_id in enumerate(self.static_layer_ids)}
+        self.static_layer_ids = list(range(static_freq - 1, self.n_layers, static_freq))
+        self.layer_id_to_static_id = {
+            layer_id: static_id for static_id, layer_id in enumerate(self.static_layer_ids)
+        }
         self.num_static_layers = len(self.static_layer_ids)
 
         self.backup_sliding_keys = None
         self.backup_sliding_values = None
 
-
     # Rewrote _sliding_update since HybridCache (4.51.3) has bugs and is unnecessarily complicated
     # (not supporting when incoming key_states are larger than 1 with filled cache)
-    def _sliding_update(self, cache_position, layer_idx, key_states, value_states, k_out, v_out, max_cache_len):
+    def _sliding_update(self, cache_position, layer_idx, key_states, value_states, k_out, v_out,
+                        max_cache_len):
         income_cache_len = key_states.shape[-2]
         old_cache_len = self._cur_tokens
         new_cache_len = old_cache_len + income_cache_len
@@ -434,15 +443,14 @@ class RetainHybridCache(HybridCache, HybridKVScore):
 
             return tmp_k_out, tmp_v_out
 
-
-    def _static_update(self, cache_position, layer_idx, key_states, value_states, k_out, v_out, max_cache_len):
+    def _static_update(self, cache_position, layer_idx, key_states, value_states, k_out, v_out,
+                       max_cache_len):
         k_out[:, :, cache_position] = key_states
         v_out[:, :, cache_position] = value_states
 
         self.key_cache[layer_idx] = k_out
         self.value_cache[layer_idx] = v_out
         return k_out, v_out
-
 
     def update(
         self,
@@ -491,8 +499,8 @@ class RetainHybridCache(HybridCache, HybridKVScore):
         )
 
     # Overriding the get_seq_length method from HybridCache
-    # Current HybridCache implementation (4.51.3) is not compatible with 
-    # Gemma3 when using model.forward() with use_cache=True, as layer_idx=0 correesponds to 
+    # Current HybridCache implementation (4.51.3) is not compatible with
+    # Gemma3 when using model.forward() with use_cache=True, as layer_idx=0 correesponds to
     # sliding window layer, thus it does not return the correct sequence length seen so far.
     # (when not given cache_position)
     def get_seq_length(self, layer_idx: Optional[int] = 0):
@@ -505,7 +513,7 @@ class RetainHybridCache(HybridCache, HybridKVScore):
             if not l in self.static_layer_ids:
                 self.backup_sliding_keys[l] = self.key_cache[l].clone().detach()
                 self.backup_sliding_values[l] = self.value_cache[l].clone().detach()
-    
+
     def restore_sliding_cache(self):
         assert self.backup_sliding_keys is not None and self.backup_sliding_values is not None
         for l in range(self.n_layers):
@@ -521,13 +529,12 @@ class RetainHybridCache(HybridCache, HybridKVScore):
         # print("slicing from", self._seen_tokens, "to", seen_token_prev)
         self._seen_tokens = seen_token_prev
 
-
     def _mem(self):
         """ Returns the memory usage of the cache in GB bytes. """
         mem = 2 * self.num_static_layers * self.key_cache[0].numel(
         ) * self.key_cache[0].element_size() / 10**9
-        mem += 2 * (self.n_layers - self.num_static_layers) * self.key_cache[0].numel(
-        ) * self.key_cache[0].element_size() / 10**9
+        mem += 2 * (self.n_layers - self.num_static_layers
+                   ) * self.key_cache[0].numel() * self.key_cache[0].element_size() / 10**9
         return round(mem, 1)
 
     def _get_valid(self, layer_idx, n_seq):
@@ -543,7 +550,7 @@ class RetainHybridCache(HybridCache, HybridKVScore):
         valid = torch.cat([valid, ones], dim=-1)
 
         return valid
-    
+
     def prune(self, ratio: float, level: str = "pair"):
         """ Prune the KV cache (fake)
             Return the mask for KV cache which is applied before the every attention.
