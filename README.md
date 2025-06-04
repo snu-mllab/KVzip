@@ -64,7 +64,7 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict
 - The code above also compares outputs generated with full versus pruned KV caches.
 - To quick test, use `-d squad`. For long-context testing, use `-d scbench_kv`
   - Available data names: [`data/load.py`](https://github.com/snu-mllab/KVzip/blob/main/data/load.py).
-  - Available model names: [`model/load.py`](https://github.com/snu-mllab/KVzip/blob/main/model/load.py), e.g., llama3-8b, qwen2.5-7b (or Qwen/Qwen2.5-7B-Instruct-1M).
+  - Available model names: [`model/load.py`](https://github.com/snu-mllab/KVzip/blob/main/model/load.py), e.g., llama3.1-8b, qwen2.5-7b (or Qwen/Qwen2.5-7B-Instruct-1M).
 - We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
 
 
