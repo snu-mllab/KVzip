@@ -220,9 +220,9 @@ class EvictCache(DynamicCache, KVScore):
 
 
 class RetainCache(DynamicCache, KVScore):
-    """ KV cache that evicts KV at each attention module while retaining the full KV in memory.
+    """ KV cache that subsamples KV at each attention module while retaining the full KV in memory.
         This cache enables evaluation across multiple compression ratios with a single prefill.
-        The EvictCache below implements actual eviction.
+        The EvictCache implements actual eviction.
     """
 
     def __init__(self, model, evict_range: Tuple[int, int]):
