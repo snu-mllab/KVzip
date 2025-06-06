@@ -67,12 +67,13 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict
   - Available data names: [`data/load.py`](https://github.com/snu-mllab/KVzip/blob/main/data/load.py).
   - Available model names: [`model/load.py`](https://github.com/snu-mllab/KVzip/blob/main/model/load.py), e.g., llama3.1-8b, qwen2.5-7b (or Qwen/Qwen2.5-7B-Instruct-1M).
 - We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
+  - Currently, our code lacks an optimized kernel for Gemma3 which uses static KV cache, so the code does not yield actual efficiency gains. However, model performance can still be evaluated using reduced attention with subsampled KV (`--kv_type retain`).
 
 
 ### Context-independent eviction (no runtime compression overhead)
 - Use the `--level head` flag.
   - We remove all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
-  - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score` (use abbreviated model names like `-m qwen2.5-7b`).
+  - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score`.
 - To compute head scores for other models:
   ```bash
   python -B test.py -m [model_name] -d scbench_qa_eng --save_head_score

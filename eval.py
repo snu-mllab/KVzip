@@ -15,6 +15,7 @@ if __name__ == "__main__":
     from model import ModelKVzip
     from utils import Evaluator, TimeStamp, set_gen_length, save_result
 
+    args.kv_type = "retain"  # only retain cache is available for evaluation
     model = ModelKVzip(args.model, dtype=args.dtype, kv_type=args.kv_type)
 
     dataset = load_dataset_all(args.data, model.tokenizer)  # list of data
@@ -26,7 +27,7 @@ if __name__ == "__main__":
     print("=" * 80, f"\nStart evaluation with {args.idx}~{max_idx} samples")
 
     for data_idx in range(args.idx, max_idx):
-        kv = dataset.prefill_context(args.idx, load_score=args.level == "head")
+        kv = dataset.prefill_context(data_idx, load_score=args.level == "head")
         inputs, info = dataset.generate_answer(data_idx, kv)
         eval = Evaluator(model, inputs, info)
 

@@ -22,7 +22,7 @@ def template(model_name, task):
 
         postfix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
 
-    elif "gemma3" in model_name:
+    elif "gemma3" in model_name or "gemma-3" in model_name:
         prefix = "<bos><start_of_turn>user\n"
         prefix += "You are a helpful assistant.\n\n"
 

@@ -37,11 +37,11 @@ def chunk_fn(ctx_ids: torch.Tensor, chunk_size: int) -> List[torch.Tensor]:
 
 
 def load_head_score(model_name, ctx_len, source="scbench_qa_eng"):
-    if model_name.startswith("Qwen/Qwen2.5-7B"):
+    if model_name.startswith("Qwen2.5-7B"):
         model_name = "qwen2.5-7b"
-    elif model_name.startswith("Qwen/Qwen2.5-14B"):
+    elif model_name.startswith("Qwen2.5-14B"):
         model_name = "qwen2.5-14b"
-    elif model_name.startswith("meta-llama/Llama-3.1-8B-Instruct"):
+    elif model_name.startswith("Llama-3.1-8B"):
         model_name = "llama3.1-8b"
 
     path = f"./utils/head_score/{model_name}-{source}-0.pt"
@@ -65,12 +65,13 @@ class ModelKVzip():
 
         if isinstance(self.model, LlamaForCausalLMW8A8):
             self.kv_type = "int4static"
+            print("[Note] Currently, only retain cache is available for QServe")
         elif isinstance(self.model, Gemma3ForCausalLM):
             self.kv_type = "hybrid_static"
+            print("[Note] Currently, only retain cache is available for Gemma3")
         else:
             self.kv_type = kv_type
         print(f"KV type: {self.kv_type}")
-
 
         self.gen_kwargs = {
             "do_sample": False,
@@ -142,7 +143,7 @@ class ModelKVzip():
     def _init_kv(self, kv=None, evict_range=(0, 0)):
         """ Initialize KV cache
         """
-        
+
         if kv is None:
             if self.kv_type == "retain":
                 kv = RetainCache(self.model, evict_range)
@@ -287,7 +288,11 @@ class ModelKVzip():
         kv = self._init_kv(kv=kv)
 
         if isinstance(self.model, LlamaForCausalLMW8A8):
-            output = self.__call__(input_ids, kv, update_cache=False, return_logits=True, is_prompt=False)
+            output = self.__call__(input_ids,
+                                   kv,
+                                   update_cache=False,
+                                   return_logits=True,
+                                   is_prompt=False)
             output = output[0]
         else:
             output = self.__call__(input_ids, kv, update_cache=False, return_logits=True)

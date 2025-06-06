@@ -85,16 +85,7 @@ class NeedleHaystackData:
             tokens_new_context = tokens_context[:insertion_point]
 
             # We want to make sure that we place our needle at a sentence break so we first see what token a '.' is
-            if (self.model_provider in ["LLaMA", "LongLLaMA"]):
-                period_tokens = [29889, 869]
-            elif (self.model_provider == "LLaMA3"):
-                period_tokens = [13, 627]  ## updated!! (".\n")
-            elif (self.model_provider == "Mistral"):
-                period_tokens = [842, 28723]
-            elif (self.model_provider == "GLM"):
-                period_tokens = [918, 30930]
-            else:
-                period_tokens = self.encode_text_to_tokens('.')
+            period_tokens = self.encode_text_to_tokens('.') + self.encode_text_to_tokens('.\n')
 
             # Then we iteration backwards until we find the first period
             while tokens_new_context and tokens_new_context[-1] not in period_tokens:

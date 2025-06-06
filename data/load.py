@@ -24,7 +24,7 @@ def load_dataset_all(name, tokenizer, n_data=100):
     else:
         raise ValueError(f"Invalid dataset: {name}")
 
-    print(f"{name} loaded, #data: {len(dataset)}")
+    print(f"\n{name} loaded, #data: {len(dataset)}")
     return dataset
 
 
