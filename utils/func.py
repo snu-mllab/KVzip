@@ -66,7 +66,7 @@ class TimeStamp():
         val = time() - self.start
         if self.unit == "ms":
             val *= 1000
-        return round(val/denominator, self.precision)
+        return round(val / denominator, self.precision)
 
     def __call__(self, msg="", denominator=1.0):
         if self.verbose:

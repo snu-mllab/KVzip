@@ -54,7 +54,7 @@ for q in queries:
     print(q, output)
 ```
 - Supported models are listed in [`model/load.py`](https://github.com/snu-mllab/KVzip/blob/main/model/load.py), including **LLaMA3, Qwen2.5/3, Gemma3**.
-- Set `load_score=True` to eliminate compression overhead. This enables context-independent KV eviction, with a trade-off in compression ratio of `ratio=0.55`.
+- Set `load_score=True` to eliminate compression overhead. This enables context-independent KV eviction, with a trade-off in compression ratio of `ratio=0.6`.
 - After generation, KV pairs corresponding to the queries and generated tokens are selectively evicted from the cache for further processing. Set `update_cache=True` to enable multi-turn inference, retaining full interaction histories throughout the inference. 
 
 ## Profiling Memory and Computation Time
@@ -79,6 +79,7 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict
   python -B test.py -m [model_name] -d scbench_qa_eng --save_head_score
   ```
   - Results will be saved in `./utils/head_score`.
+  - If targeting a coding task, we recommend additionally running the command above with `-d scbench_repoqa`. Our code uses the maximum head scores across QA and coding tasks, which improves performance.
 - These scores can be seamlessly integrated with [DuoAttention](https://github.com/mit-han-lab/duo-attention)'s optimized inference engine by replacing their head score data with ours.
 
 

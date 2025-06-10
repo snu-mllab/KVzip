@@ -3,6 +3,7 @@
 # GitHub Repository: https://github.com/snu-mllab/KVzip
 # ------------------------------------------------------------------------------
 import torch
+import glob
 from typing import List, Tuple, Union, Optional
 from tqdm import tqdm
 from transformers import DynamicCache, Gemma3ForCausalLM, Qwen3ForCausalLM
@@ -36,7 +37,7 @@ def chunk_fn(ctx_ids: torch.Tensor, chunk_size: int) -> List[torch.Tensor]:
     return input_ids
 
 
-def load_head_score(model_name, ctx_len, source="scbench_qa_eng"):
+def load_head_score(model_name, ctx_len):
     if model_name.startswith("Qwen2.5-7B"):
         model_name = "qwen2.5-7b"
     elif model_name.startswith("Qwen2.5-14B"):
@@ -44,12 +45,16 @@ def load_head_score(model_name, ctx_len, source="scbench_qa_eng"):
     elif model_name.startswith("Llama-3.1-8B"):
         model_name = "llama3.1-8b"
 
-    path = f"./utils/head_score/{model_name}-{source}-0.pt"
-    attn = torch.load(path).squeeze().cuda()  # layer x head
+    attn_ = []
+    paths = f"./utils/head_score/{model_name}-*-0.pt"
+    for path in glob.glob(paths):
+        attn = torch.load(path).squeeze().cuda()  # layer x head
+        attn_.append(attn)
+        print("Load head-score from", path)
+
+    attn = torch.stack(attn_, dim=0).amax(0)
     score = attn.unsqueeze(-1).expand(-1, -1, ctx_len)  # layer x head x seq
     score = score.unsqueeze(1)
-
-    print("Load head-score from", path)
     return score
 
 
@@ -224,13 +229,12 @@ class ModelKVzip():
     ):
         """ KV importance scoring (update kv.score)
         """
-        input_ids = self.self_task(ctx_ids)
-
         if not load_score:
             kv.init_score()
             start_idx_tmp = kv.start_idx
 
             kv.end_idx = 0
+            input_ids = self.self_task(ctx_ids)
             for i, (prefill_ids_p,
                     repeat_ids_p) in enumerate(tqdm(input_ids, desc=f"Importance scoring")):
                 if i > 0:
