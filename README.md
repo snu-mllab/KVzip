@@ -79,7 +79,7 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict --ratio 0.3
   python -B test.py -m [model_name] -d scbench_qa_eng --save_head_score
   ```
   - Results will be saved in `./utils/head_score`.
-  - If targeting a coding task, we recommend additionally running the command above with `-d scbench_repoqa`. Our code uses the maximum head scores across QA and coding tasks, which improves performance.
+  - If targeting a coding task, we recommend additionally running the command with `-d scbench_repoqa`. This allows the model to use the max head scores from both natural and coding languages, which improves performance.
 - These scores can be seamlessly integrated with [DuoAttention](https://github.com/mit-han-lab/duo-attention)'s optimized inference engine by replacing their head score data with ours.
 
 
