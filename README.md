@@ -60,7 +60,7 @@ for q in queries:
 ## Profiling Memory and Computation Time
 ### Context-dependent eviction
 ```bash
-python -B test.py -m [model_name] -d [data_name] --kv_type evict
+python -B test.py -m [model_name] -d [data_name] --kv_type evict --ratio 0.3
 ```
 - The code above also compares outputs generated with full versus pruned KV caches.
 - To quick test, use `-d squad`. For long-context testing, use `-d scbench_kv`.
@@ -71,7 +71,7 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict
 
 
 ### Context-independent eviction (no runtime compression overhead)
-- Use the `--level head` flag.
+- Use the `--level head` flag with `--ratio 0.6` (recommended).
   - We remove all context KV pairs associated with a specific head while retaining system prompt and query KV pairs.
   - Precomputed head scores are available for LLaMA3.1-8B and Qwen2.5-7/14B in `./utils/head_score`.
 - To compute head scores for other models:
