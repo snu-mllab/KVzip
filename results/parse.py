@@ -113,7 +113,8 @@ if __name__ == "__main__":
                 ratio_ = info[0]
                 preds[ratio_].append(text["pruned"])
 
-            preds[1.0].append(text["full__"])
+            if 1.0 not in preds:
+                preds[1.0].append(text["full__"])
             answers.append(text["answer"])
 
         # for some tasks, evaluation require additional information (e.g., code language in repoqa)
