@@ -237,11 +237,9 @@ class ModelKVzip():
             input_ids = self.self_task(ctx_ids)
             for i, (prefill_ids_p,
                     repeat_ids_p) in enumerate(tqdm(input_ids, desc=f"Importance scoring")):
-                if i > 0:
-                    kv.start_idx = kv.end_idx
                 kv.end_idx = kv.start_idx + prefill_ids_p.shape[1]  # indices for a chunk
-
                 self.__call__(repeat_ids_p, kv, update_cache=False)  # get score
+                kv.start_idx = kv.end_idx
 
             kv.start_idx = start_idx_tmp
             assert kv.score[0].shape[-1] == kv.ctx_len

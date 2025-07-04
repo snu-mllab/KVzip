@@ -20,7 +20,7 @@ parser.add_argument(
     '--model',
     type=str,
     help=
-    "check the model list in model/load.py. recommended to use abbreviated model names, e.g., llama3-8b, qwen2.5-7b"
+    "check the model list in model/load.py. recommended to use abbreviated model names, e.g., llama3.1-8b, qwen2.5-7b"
 )
 parser.add_argument('--dtype', type=str, default=None, help="model dtype (automatically loaded)")
 

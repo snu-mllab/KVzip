@@ -15,7 +15,7 @@ if __name__ == "__main__":
     from model import ModelKVzip
     from utils import Evaluator, TimeStamp, set_gen_length, save_result
 
-    args.kv_type = "retain"  # only retain cache is available for evaluation
+    args.kv_type = "retain"  # RetainCache enables efficient evaluation across multiple compression ratios with a single prefilling.
     model = ModelKVzip(args.model, dtype=args.dtype, kv_type=args.kv_type)
 
     dataset = load_dataset_all(args.data, model.tokenizer)  # list of data
