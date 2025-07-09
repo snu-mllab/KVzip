@@ -5,12 +5,22 @@ from datasets import load_dataset, Dataset
 
 def load_dataset_all(name, tokenizer, n_data=100):
     """ 
-    Each data example has a format of {context: str, question: List[str], answers: List[str]}
+    Each data example has a format of {context: str, question: List[str], answers: List[str]}.
     
-    possible datasets = ["needle", "squad", "gsm_long", "scbench_many_shot", "scbench_mf", "scbench_repoqa",
+    possible datasets = ["needle", "squad", "gsm", 
+                        ""scbench_kv", "scbench_vt",  scbench_many_shot", "scbench_mf", "scbench_repoqa",
                         "scbench_choice_eng", "scbench_prefix_suffix", "scbench_summary", "scbench_qa_eng",
-                        "scbench_vt", "scbench_kv", "scbench_summary_with_needles", "scbench_repoqa_and_kv"]
-    We also provide a shortened version of SCBench (e.g., scbench_kv_tiny), check data/scbehcn/data
+                        "scbench_summary_with_needles", "scbench_repoqa_and_kv"]
+
+    Note: 
+        We preprocess SCBench to follow the data format described above.
+        Additionally, we subsample scbench_choice_eng and scbench_qa_eng to ensure that the context token length (LLaMA3 tokenizer) 
+        is less than 125K, fitting within the context limit of LLaMA3 models.
+        These preprocessed datasets are available on Hugging Face: Jang-Hyun/SCBench-preprocessed
+
+        We also provide shortened SCBench, excluding tasks {choce_eng, qa_eng, vt}, which are difficult to shorten.
+        - The "tiny" tag (e.g., scbench_kv_tiny) has a context length of approximately 8k tokens.
+        - The "short" tag (e.g., scbench_kv_short) has a context length of approximately 20k tokens.
     """
 
     if name == "squad":
@@ -91,10 +101,13 @@ def load_gsm(tokenizer, n_data):
     return dataset
 
 
-def load_scbench(name, path="./data/scbench"):
-    dataset = []
-    samples = torch.load(os.path.join(path, f"{name}.pt"))
+def load_scbench(name):
+    check_scbench_name(name)
+    samples = load_dataset('Jang-Hyun/SCBench-preprocessed',
+                           data_files=f"{name}.parquet",
+                           split='train')
 
+    dataset = []
     for data in samples:
         d = {}
         d["context"] = data["prompts"][0]
@@ -110,6 +123,29 @@ def load_scbench(name, path="./data/scbench"):
         dataset.append(d)
 
     return dataset
+
+
+def check_scbench_name(name):
+    name = name.split("scbench_")[1]
+    possible_tags = [
+        "many_shot",
+        "mf",
+        "repoqa",
+        "choice_eng",
+        "prefix_suffix",
+        "summary",
+        "qa_eng",
+        "vt",
+        "kv",
+        "summary_with_needles",
+        "repoqa_and_kv",
+    ]
+    if "tiny" in name:
+        name = name.split("_tiny")[0]
+    if "short" in name:
+        name = name.split("_short")[0]
+
+    assert name in possible_tags, "SCBench data name not exist!"
 
 
 if __name__ == "__main__":

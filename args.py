@@ -13,7 +13,7 @@ parser.add_argument(
     default='pair',
     choices=['pair', 'head', 'pair-uniform'],
     help="head: context-independent head-level eviction. pair-uniform: uniform head-budget ratios")
-parser.add_argument('-r', '--ratio', type=float, default=0.3, help="compression ratio")
+parser.add_argument('-r', '--ratio', type=float, default=0.3, help="compression ratio (= retained/full)")
 
 parser.add_argument(
     '-m',

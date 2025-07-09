@@ -28,14 +28,7 @@ pip install flash-attn==2.7.4.post1 --no-build-isolation
 make i
 ```
 - To use [QServe](https://github.com/mit-han-lab/omniserve) quantization, please follow [`./model/quant_model`](https://github.com/snu-mllab/KVzip/tree/main/model/quant_model).
-### Dataset
-- Please download the preprocessed SCBench dataset from [Google Drive](https://drive.google.com/file/d/1cqoR6pxxFcjFqvPZkuAmF-fBSAlAbjbN/view?usp=share_link).
-- If you download the unzipped the files, simply move the scbench folder.
-```bash
-mv scbench.zip kvzip/data/
-cd kvzip/data
-unzip scbench.zip  
-```
+
 
 ## Quick Start
 ```python
@@ -89,7 +82,7 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict --ratio 0.3
     python -B eval.py -m [model_name] -d [data_name] --kv_type retain --num 100
     ``` 
   - Results will be saved in `./results/[data_name]`.
-  - Supported datasets are listed in `data/load.py`.
+  - Supported datasets are listed in [`data/load.py`](https://github.com/snu-mllab/KVzip/blob/main/data/load.py).
 - To compute evaluation metrics from generated results:
   ```bash
   python -B -m results.parse -m [model_name] -d [data_name]
