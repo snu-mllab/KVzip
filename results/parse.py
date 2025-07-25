@@ -66,7 +66,6 @@ def set_ratios(model_name):
 
 
 if __name__ == "__main__":
-    from transformers import AutoTokenizer
     import argparse
     import os
     import glob
@@ -113,7 +112,7 @@ if __name__ == "__main__":
                 ratio_ = info[0]
                 preds[ratio_].append(text["pruned"])
 
-            if 1.0 not in preds:
+            if len(preds[1.0]) < len(preds[ratios[-1]]):  # add full cache results
                 preds[1.0].append(text["full__"])
             answers.append(text["answer"])
 
