@@ -39,18 +39,7 @@ def get_model_id(name: str):
         return name  # Warning: some models might not be compatible and cause errors
 
 
-def get_dtype(name: str):
-    if name == "fp32":
-        return torch.float32
-    elif name == "fp16":
-        return torch.float16
-    elif name == "bf16":
-        return torch.bfloat16
-    else:
-        return None
-
-
-def load_model(model_name: str, dtype=None, **kwargs):
+def load_model(model_name: str, **kwargs):
     model_id = get_model_id(model_name)
     if not ("w8a8kv4" in model_name):
         from model.monkeypatch import replace_attn
@@ -67,7 +56,7 @@ def load_model(model_name: str, dtype=None, **kwargs):
 
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
-            torch_dtype=config.torch_dtype if dtype is None else get_dtype(dtype),
+            torch_dtype="auto",
             device_map="auto",
             attn_implementation='flash_attention_2',
             config=config,

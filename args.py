@@ -1,6 +1,7 @@
 import argparse
 
 parser = argparse.ArgumentParser(description='')
+parser.add_argument('-r', '--ratio', type=float, default=0.3, help="compression ratio (= retained/full)")
 parser.add_argument(
     '--kv_type',
     type=str,
@@ -13,7 +14,6 @@ parser.add_argument(
     default='pair',
     choices=['pair', 'head', 'pair-uniform'],
     help="head: context-independent head-level eviction. pair-uniform: uniform head-budget ratios")
-parser.add_argument('-r', '--ratio', type=float, default=0.3, help="compression ratio (= retained/full)")
 
 parser.add_argument(
     '-m',
@@ -22,7 +22,6 @@ parser.add_argument(
     help=
     "check the model list in model/load.py. recommended to use abbreviated model names, e.g., llama3.1-8b, qwen2.5-7b"
 )
-parser.add_argument('--dtype', type=str, default=None, help="model dtype (automatically loaded)")
 
 parser.add_argument('-d',
                     '--data',

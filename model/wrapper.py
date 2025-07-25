@@ -60,8 +60,8 @@ def load_head_score(model_name, ctx_len):
 
 class ModelKVzip():
 
-    def __init__(self, model_name: str, dtype: Optional[str] = None, kv_type: str = "evict"):
-        self.model, self.tokenizer = load_model(model_name, dtype=dtype)
+    def __init__(self, model_name: str, kv_type: str = "evict"):
+        self.model, self.tokenizer = load_model(model_name)
 
         self.name = self.model.name
         self.dtype = self.model.dtype
