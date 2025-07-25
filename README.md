@@ -19,6 +19,11 @@
 <img src="./images/benchmark.png" width="800">
 
 
+## News
+- **07/2025**: [NVIDIA KVpress](https://github.com/NVIDIA/kvpress) adds support for KVzip.
+- **07/2025**: KVzip is presented at the [ES-FoMo III ICML Workshop](https://es-fomo.com).
+- **05/2025**: [arXiv preprint]((https://arxiv.org/abs/2505.23416)) is released.
+
 ## Installation
 We used CUDA 12.1 and Python 3.10
 ```bash
