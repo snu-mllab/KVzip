@@ -1,8 +1,6 @@
 import transformers
 from attention.attn import llama_qwen_attn_forward, gemma3_attn_forward
 
-import transformers.models.gemma3.modeling_gemma3
-
 
 def replace_attn(model_id):
     model_id = model_id.lower()
