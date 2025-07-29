@@ -29,6 +29,7 @@ parser.add_argument('-d',
                     help="check the dataset list in data/load.py (e.g., squad, needle, scbench_kv)")
 parser.add_argument('--idx', type=int, default=0, help="the index of a data example")
 parser.add_argument('--num', type=int, default=1, help="the total number of eval data")
+parser.add_argument('--tag', type=str, default=None, help="evaluation folder name tag")
 
-parser.add_argument('--save_head_score', action="store_true")
+parser.add_argument('--save_head_score', action="store_true", help="save head-level importance score")
 args = parser.parse_args()

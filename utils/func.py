@@ -21,11 +21,12 @@ def set_gen_length(dataname, model=None):
 
 
 def save_result(args, dataname, outputs, idx):
-    path = f"./results/{dataname}/{idx}_{args.model}"
+    folder_tag = f"_{args.tag}" if args.tag else ""
+    path = f"./results/{dataname}/{idx}_{args.model}{folder_tag}"
     os.makedirs(path, exist_ok=True)
 
-    tag = f"-{args.level}"
-    with open(f"{path}/output{tag}.json", 'w') as f:
+    file_tag = f"-{args.level}"
+    with open(f"{path}/output{file_tag}.json", 'w') as f:
         json.dump(outputs, f, indent=4)
 
 

@@ -46,7 +46,7 @@ def load_model(model_name: str, **kwargs):
         replace_attn(model_id)
 
         config = AutoConfig.from_pretrained(model_id)
-        if "qwen3-" in model_name:
+        if "Qwen3-" in model_id:
             config.rope_scaling = {
                 "rope_type": "yarn",
                 "factor": 4.0,
