@@ -42,7 +42,7 @@ class DataWrapper():
         kv = self.model.prefill(ctx_ids, load_score=load_score)
 
         print(f"# prefill {self.model.name} {self.name}-{idx}:", end=" ")
-        print(f"{len(ctx_ids[0])} tokens, {kv._mem()} GB, {kv.key_cache[0].dtype}")
+        print(f"{len(ctx_ids[0])} tokens, KV cache {kv._mem()} GB, {kv.key_cache[0].dtype}")
         return kv
 
     def _prepare_query(self, data, kv, inputs: dict, task: str):

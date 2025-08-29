@@ -17,7 +17,7 @@ if __name__ == "__main__":
     tt("prefill context and get importance score")
 
     inputs, info = dataset.generate_answer(args.idx, kv)
-    tt("get answers and probability for eval")
+    tt("get answers and prediction probabilities for evaluation")
 
     if args.save_head_score:
         head_score = torch.stack(kv.score, dim=0).squeeze()

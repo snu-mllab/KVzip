@@ -1,6 +1,7 @@
 import os
 import torch
 from collections import defaultdict
+from datasets import load_dataset
 from results.metric import evaluate_answer
 from eval import set_ratios
 
@@ -10,7 +11,9 @@ def parse_answer(name):
     subtasks = []
     if "many_shot" in name:
         answers = []
-        samples = torch.load(f"./data/scbench/{name}.pt")
+        samples = load_dataset('Jang-Hyun/SCBench-preprocessed',
+                           data_files=f"{name}.parquet",
+                           split='train')
         for data in samples:
             d = []
             for q, gt in zip(data["prompts"][1:], data["ground_truth"]):
@@ -24,7 +27,9 @@ def parse_answer(name):
 
     elif "repoqa" in name:
         answers = []
-        samples = torch.load(f"./data/scbench/{name}.pt")
+        samples = load_dataset('Jang-Hyun/SCBench-preprocessed',
+                           data_files=f"{name}.parquet",
+                           split='train')
         for data in samples:
             d = defaultdict(list)
             d["lang"] = data["lang"]
@@ -39,7 +44,9 @@ def parse_answer(name):
     elif "summary_with_needles" in name:
         answers = []
         subtasks = []
-        samples = torch.load(f"./data/scbench/{name}.pt")
+        samples = load_dataset('Jang-Hyun/SCBench-preprocessed',
+                           data_files=f"{name}.parquet",
+                           split='train')
         for data in samples:
             d = defaultdict(list)
             subtasks.append(data["task"])
