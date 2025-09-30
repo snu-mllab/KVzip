@@ -109,7 +109,7 @@ To integrate KVzip for a new model, you will need to update the following files:
 @article{kim2025kvzip,
         title={KVzip: Query-Agnostic KV Cache Compression with Context Reconstruction},
         author={Kim, Jang-Hyun and Kim, Jinuk and Kwon, Sangwoo and Lee, Jae W and Yun, Sangdoo and Song, Hyun Oh},
-        journal={arXiv preprint arXiv:2505.23416},
+        journal={Advances in Neural Information Processing Systems},
         year={2025}
 }
 ```
