@@ -33,7 +33,3 @@ parser.add_argument('--tag', type=str, default=None, help="evaluation folder nam
 
 parser.add_argument('--save_head_score', action="store_true", help="save head-level importance score")
 args = parser.parse_args()
-
-
-if args.level != "pair":
-    args.tag = args.tag + f"_{args.level}" if args.tag else args.level
