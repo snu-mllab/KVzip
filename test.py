@@ -22,7 +22,7 @@ if __name__ == "__main__":
     if args.save_head_score:
         head_score = torch.stack(kv.score, dim=0).squeeze()
         torch.save(head_score.amax(-1),
-                   f"./utils/head_score/{args.model}-{args.data}-{args.idx}.pt")
+                   f"./utils/head_score/{model.name}-{args.data}-{args.idx}.pt")
 
     kv.prune(args.ratio, args.level)  # evict KV
     eval = Evaluator(model, inputs, info, verbose=True)

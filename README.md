@@ -20,7 +20,7 @@
 
 
 ## News
-- **07/2025**: 🎉 KVzip has been accepted at NeurIPS 2025 as an **Oral Presentation**! 
+- **09/2025**: 🎉 KVzip has been accepted at NeurIPS 2025 as an **Oral Presentation**! 
 - **07/2025**: [NVIDIA KVpress](https://github.com/NVIDIA/kvpress) adds support for KVzip (see also [Leaderboard](https://huggingface.co/spaces/nvidia/kvpress-leaderboard)).
 - **07/2025**: KVzip is presented at the [ES-FoMo III ICML Workshop](https://es-fomo.com).
 - **05/2025**: [arXiv preprint]((https://arxiv.org/abs/2505.23416)) is released.

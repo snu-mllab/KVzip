@@ -46,7 +46,7 @@ def load_head_score(model_name, ctx_len):
         model_name = "llama3.1-8b"
 
     attn_ = []
-    paths = f"./utils/head_score/{model_name}-*-0.pt"
+    paths = f"./utils/head_score/{model_name}-*.pt"
     for path in glob.glob(paths):
         attn = torch.load(path).squeeze().cuda()  # layer x head
         attn_.append(attn)
