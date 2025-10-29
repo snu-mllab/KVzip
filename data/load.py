@@ -69,6 +69,7 @@ def load_niah(tokenizer, max_len=8000):
 
     for context_len in [500, 2000, max_len]:
         needle = NeedleHaystackData(tokenizer,
+                                    haystack_dir="./data/needle/PaulGrahamEssays",
                                     context_lengths=[context_len],
                                     final_context_length_buffer=0)
 
