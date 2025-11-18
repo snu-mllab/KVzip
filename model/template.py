@@ -8,21 +8,16 @@ def template(model_name, task):
 
         postfix = "\n\n<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
 
-    elif "qwen2.5-" in model_name:
+    elif model_name.startswith("qwen"):
         # https://github.com/QwenLM/Qwen3
         prefix = "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n"
         prefix += "<|im_start|>user\n"
 
         postfix = "<|im_end|>\n<|im_start|>assistant\n"
+        if "qwen3-" in model_name:
+            postfix += "<think>\n\n</think>\n\n"
 
-    elif "qwen3-" in model_name:
-        # https://github.com/QwenLM/Qwen3
-        prefix = "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n"
-        prefix += "<|im_start|>user\n"
-
-        postfix = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
-
-    elif "gemma3" in model_name or "gemma-3" in model_name:
+    elif model_name.startswith("gemma3") or model_name.startswith("gemma-3"):
         prefix = "<bos><start_of_turn>user\n"
         prefix += "You are a helpful assistant.\n\n"
 
