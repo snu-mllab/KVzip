@@ -104,7 +104,7 @@ def include_score_gsm(pred, ref, normalize=True):
 
 
 def include_score_manyshot(pred, ref, normalize=True):
-    if pred[0] == "(" and ref[0] == "(":
+    if "(" in pred and "(" in ref:
         pred = pred.split("(")[1].split(")")[0]  # (A) xx => A
         ref = ref.split("(")[1].split(")")[0]
         val = pred == ref
