@@ -116,13 +116,9 @@ class EvictCache(DynamicCache, KVScore):
     def _mem(self):
         """ Returns the memory usage of the cache in GB.
         """
-        if self.info["flatten"]:
-            mem = 0
-            for i in range(self.n_layers):
-                mem += self.key_cache[i].numel() * self.key_cache[i].element_size()
-        else:
-            mem = self.n_layers * self.key_cache[0].numel() * self.key_cache[0].element_size()
-
+        mem = 0
+        for i in range(self.n_layers):
+            mem += self.key_cache[i].numel() * self.key_cache[i].element_size()
         mem *= 2  # key + value
         return round(mem / 10**9, 1)
 
