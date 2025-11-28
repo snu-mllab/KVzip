@@ -108,10 +108,8 @@ class EvictCache(DynamicCache, KVScore):
     def get_seq_length(self, layer_idx: Optional[int] = 0) -> int:
         if len(self.key_cache) <= layer_idx:
             return 0
-        elif self.info["flatten"]:
-            return self.info["full_len"] + self.info["offset"][layer_idx]
         else:
-            return self.key_cache[layer_idx].size(-2)
+            return self._seen_tokens
 
     def _mem(self):
         """ Returns the memory usage of the cache in GB.
@@ -182,9 +180,8 @@ class EvictCache(DynamicCache, KVScore):
             "cu_head": cu_head,
             "len_k": len_k_layers,  # kv lengths of heads in a layer
             "max_len_k": max_len_k_layers,  # max kv lengths of heads in a layer
-            "cu_len_k": cu_len_k_layers,  # cumulative kv length of heads in a layer (only updated)
-            "full_len": klen,  # original kv len
-            "offset": [0 for _ in range(self.n_layers)],  # newly processed kv lengths
+            "cu_len_k": cu_len_k_layers,  # cumulative kv length of heads in a layer
+            "offset": [0 for _ in range(self.n_layers)],  # lengths of newly processed kv after prefilling
         }
 
     def prepare(

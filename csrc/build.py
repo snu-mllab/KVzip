@@ -3,16 +3,17 @@
 # Licensed under The MIT License
 # GitHub Repository: https://github.com/FFY0/AdaKV
 # ------------------------------------------------------------------------------
-import subprocess
 import os
-from packaging.version import parse, Version
+import subprocess
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from packaging.version import Version, parse
+from setuptools import find_packages, setup
 from torch.utils.cpp_extension import (
+    CUDA_HOME,
     BuildExtension,
     CppExtension,
     CUDAExtension,
-    CUDA_HOME,
 )
 
 # package name managed by pip, which can be remove by `pip uninstall tiny_pkg`
@@ -21,8 +22,13 @@ PACKAGE_NAME = "tiny_pkg"
 ext_modules = []
 generator_flag = []
 cc_flag = []
+# 1. Target NVIDIA A100, RTX3090 (Ampere)
 cc_flag.append("-gencode")
 cc_flag.append("arch=compute_80,code=sm_80")
+
+# 2. Target NVIDIA H100 (Hopper)
+cc_flag.append("-gencode")
+cc_flag.append("arch=compute_90,code=sm_90")
 
 
 # helper function to get cuda version

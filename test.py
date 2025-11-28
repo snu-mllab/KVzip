@@ -27,7 +27,8 @@ if __name__ == "__main__":
     kv.prune(args.ratio, args.level)  # evict KV
     eval = Evaluator(model, inputs, info, verbose=True)
 
-    tt.set()
-    eval.generation(kv, "qa")  # compare generation results (full vs evicted cache)
-    tt(f"generation at ratio {args.ratio}")
-    eval.forward(kv, "qa")  # compare output probabilites on answers
+    for task in info.keys():
+        tt.set()
+        eval.generation(kv, task)  # compare generation results (full vs evicted cache)
+        tt(f"generation at ratio {args.ratio}")
+        eval.forward(kv, task)  # compare output probabilites on answers
