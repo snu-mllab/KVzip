@@ -17,6 +17,8 @@ dependencies = [
     "rouge-score",
     "fuzzywuzzy",
     "rich",
+    "rouge",
+    "tree-sitter==0.21.3",
     "tree-sitter-languages==1.10.2",
     "pandas==2.0.3",
     "numpy==1.26.4",

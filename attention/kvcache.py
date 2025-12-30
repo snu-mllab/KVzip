@@ -3,12 +3,12 @@
 # Licensed under The MIT License
 # GitHub Repository: https://github.com/snu-mllab/KVzip
 # ------------------------------------------------------------------------------
-import torch
-from transformers import DynamicCache, HybridCache
-from attention.score import KVScore, HybridKVScore
-from typing import Tuple, Optional, Dict, Any
+from typing import Any, Dict, Optional, Tuple
 
+import torch
+from attention.score import HybridKVScore, KVScore
 from tiny_api_cuda import update_flatten_view
+from transformers import DynamicCache, HybridCache
 
 
 class EvictCache(DynamicCache, KVScore):
@@ -194,16 +194,17 @@ class EvictCache(DynamicCache, KVScore):
         """ Subsample KV and flatten features for var_len FlashAttention
         """
         bsz, n_heads_q, q_len, dim = query_states.shape
+        cu_len_q = q_len * self.info["cu_head"]
 
         query_states = query_states.view(bsz, self.n_heads_kv, self.n_group_kv, q_len, dim)
         query_states = query_states.transpose(2, 3).contiguous().view(
             -1, self.n_group_kv, dim)  # bsz x head x seq, group, dim
 
         self.info["offset"][layer_idx] += q_len
-        self.info["cu_len_k"][layer_idx] += q_len * self.info["cu_head"]
+        self.info["cu_len_k"][layer_idx] += cu_len_q
 
         info = {
-            "cu_len_q": q_len * self.info["cu_head"],
+            "cu_len_q": cu_len_q,
             "cu_len_k": self.info["cu_len_k"][layer_idx],
             "max_len_q": q_len,
             "max_len_k": self.info["max_len_k"][layer_idx] + self.info["offset"][layer_idx]
