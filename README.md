@@ -89,6 +89,8 @@ python -B test.py -m [model_name] -d [data_name] --kv_type evict --ratio 0.3
     ``` 
   - Results will be saved in `./results/[data_name]`.
   - Supported datasets are listed in [`data/load.py`](https://github.com/snu-mllab/KVzip/blob/main/data/load.py).
+    - We used "scbench_{kv,prefix_suffix}_short" for Gemma3-12B evaluation (max_token_length issue). 
+    - We used "scbench_{kv,prefix_suffix,mf}\_tiny" and "scbench_repoqa_short" for LLaMA3-8B-W8A8KV4 evaluation (lack of the base model capability issue). 
 - To compute evaluation metrics from generated results:
   ```bash
   python -B -m results.parse -m [model_name] -d [data_name]

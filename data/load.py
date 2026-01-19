@@ -1,6 +1,4 @@
-import os
-import torch
-from datasets import load_dataset, Dataset
+from datasets import Dataset, load_dataset
 
 
 def load_dataset_all(name, tokenizer, n_data=100):
@@ -21,6 +19,7 @@ def load_dataset_all(name, tokenizer, n_data=100):
         We also provide shortened SCBench, excluding tasks {choce_eng, qa_eng, vt}, which are difficult to shorten.
         - The "tiny" tag (e.g., scbench_kv_tiny) has a context length of approximately 8k tokens.
         - The "short" tag (e.g., scbench_kv_short) has a context length of approximately 20k tokens.
+        - The "mid" tag (e.g., scbench_kv_mid) has a context length of approximately 60k tokens.
     """
 
     if name == "squad":
@@ -143,14 +142,17 @@ def check_scbench_name(name):
     ]
     if "tiny" in name:
         name = name.split("_tiny")[0]
-    if "short" in name:
+    elif "short" in name:
         name = name.split("_short")[0]
+    elif "mid" in name:
+        name = name.split("_mid")[0]
 
     assert name in possible_tags, "SCBench data name not exist!"
 
 
 if __name__ == "__main__":
     import argparse
+
     from transformers import AutoTokenizer
 
     parser = argparse.ArgumentParser(description='')
