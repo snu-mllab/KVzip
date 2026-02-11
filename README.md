@@ -4,7 +4,16 @@
 
 <img src="./images/method.png" width="800">
 
-## What's New?
+
+## News
+- **01/2026**: We've released [Fast KVzip](https://github.com/Janghyun1230/FastKVzip), which eliminates compression overhead and enhances both prefill and decoding efficiency!
+- **09/2025**: 🎉 KVzip has been accepted at NeurIPS 2025 as an **Oral Presentation**! 
+- **07/2025**: [NVIDIA KVpress](https://github.com/NVIDIA/kvpress) adds support for KVzip (see also [Leaderboard](https://huggingface.co/spaces/nvidia/kvpress-leaderboard)).
+- **07/2025**: KVzip is presented at the [ES-FoMo III ICML Workshop](https://es-fomo.com).
+- **05/2025**: [arXiv preprint]((https://arxiv.org/abs/2505.23416)) is released.
+
+
+## Highlights
 - KVzip compresses the KV cache to support **diverse future queries**.
 - [Context-dependent] Achieve a **3–4× reduction in KV cache size** and a **2× decrease in decoding latency**, with minimal performance degradation.
 - [Context-independent] Enhance [DuoAttention](https://github.com/mit-han-lab/duo-attention)-style head-level KV compression, using only **a few forward passes within one minute** for head-level importance-score optimization (100x faster).
@@ -12,18 +21,12 @@
 <img src="./images/demo.png" width="800">
 
 
-### Benchmarking on query-agnostic setting
+### Benchmarking on a query-agnostic setting
 - Tasks: [SQuAD](https://huggingface.co/datasets/rajpurkar/squad), [NIAH](https://github.com/gkamradt/LLMTest_NeedleInAHaystack), [SCBench](https://github.com/microsoft/MInference/tree/main/scbench), [GSM8K](https://huggingface.co/datasets/openai/gsm8k/viewer/main/train?row=7294). 
 - Model: [Qwen2.5-7B-Instruct-1M](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
 
 <img src="./images/benchmark.png" width="800">
 
-
-## News
-- **09/2025**: 🎉 KVzip has been accepted at NeurIPS 2025 as an **Oral Presentation**! 
-- **07/2025**: [NVIDIA KVpress](https://github.com/NVIDIA/kvpress) adds support for KVzip (see also [Leaderboard](https://huggingface.co/spaces/nvidia/kvpress-leaderboard)).
-- **07/2025**: KVzip is presented at the [ES-FoMo III ICML Workshop](https://es-fomo.com).
-- **05/2025**: [arXiv preprint]((https://arxiv.org/abs/2505.23416)) is released.
 
 ## Installation
 We used CUDA 12.1 and Python 3.10
@@ -62,7 +65,7 @@ for q in queries:
 python -B test.py -m [model_name] -d [data_name] --kv_type evict --ratio 0.3
 ```
 - The code above also compares outputs generated with full versus pruned KV caches.
-- To quick test, use `-d squad`. For long-context testing, use `-d scbench_kv`.
+- To quickly test, use `-d squad`. For long-context testing, use `-d scbench_kv`.
   - Available data names: [`data/load.py`](https://github.com/snu-mllab/KVzip/blob/main/data/load.py).
   - Available model names: [`model/load.py`](https://github.com/snu-mllab/KVzip/blob/main/model/load.py), e.g., llama3.1-8b, qwen2.5-7b (or Qwen/Qwen2.5-7B-Instruct-1M).
 - We adapt CUDA kernel from [AdaKV](https://github.com/FFY0/AdaKV/tree/main), supporting non-uniform head budget allocation.
