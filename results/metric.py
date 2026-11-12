@@ -123,7 +123,30 @@ def exact_match_score(pred, ref, normalize=True):
     return pred == ref
 
 
+def _validate_lengths(preds, refs, subtask, context):
+    references = refs["ground_truth"] if isinstance(refs, dict) else refs
+    if len(preds) != len(references):
+        raise ValueError(
+            f"{context}: mismatched counts: predictions={len(preds)}, references={len(references)}"
+        )
+    if subtask is not None and len(subtask) != len(preds):
+        raise ValueError(
+            f"{context}: subtask count={len(subtask)}, predictions={len(preds)}"
+        )
+    if isinstance(refs, dict):
+        # Mixed RepoQA/KV inputs only index names for RepoQA subtasks.
+        required_names = len(references) if subtask is None else max(
+            (i + 1 for i, task in enumerate(subtask) if "repoqa" in task), default=0
+        )
+        if not required_names <= len(refs["func_name"]) <= len(references):
+            raise ValueError(
+                f"{context}: func_name count={len(refs['func_name'])}, "
+                f"required={required_names}, references={len(references)}"
+            )
+
+
 def repoqa_score(preds, refs, subtask=None):
+    _validate_lengths(preds, refs, subtask, "repoqa")
     needle_by_repo = defaultdict(list)
     for name, gt in zip(refs["func_name"], refs["ground_truth"]):
         needle_by_repo[refs["repo"]].append({"needle": gt, "name": name})
@@ -154,6 +177,7 @@ def repoqa_score(preds, refs, subtask=None):
 
 
 def evaluate_answer(preds, refs, dataname, format, similarity=False, subtask=None):
+    _validate_lengths(preds, refs, subtask, dataname)
     score = []
     if "repoqa" in dataname and not similarity:
         if "repoqa_and_kv" in dataname:
