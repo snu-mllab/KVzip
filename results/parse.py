@@ -132,7 +132,12 @@ if __name__ == "__main__":
 
         # evaluate answers across compression ratios
         for r in ratios:
-            perf = evaluate_answer(preds[r], answers, args.data, args.task, subtask=subtask)
+            try:
+                perf = evaluate_answer(preds[r], answers, args.data, args.task, subtask=subtask)
+            except ValueError as exc:
+                raise ValueError(
+                    f"{args.data}: sample {i}, file {file}, ratio {r}: {exc}"
+                ) from exc
             eval_list_ratio[r].append(perf)
 
     print("ratio avg_performance")
